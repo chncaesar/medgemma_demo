@@ -224,6 +224,7 @@ def deploy(project_id: str) -> str:
         "--maintenance-policy", "TERMINATE",
         "--metadata-from-file", f"startup-script={script_path}",
         "--tags", "medgemma-server",
+        "--no-address",  # No external IP - all access via IAP tunnel
     ]
 
     # Add accelerator flag only for non-g2 machines
@@ -249,18 +250,8 @@ def deploy(project_id: str) -> str:
         "--description", "Allow IAP tunnel access to MedGemma",
     ])
 
-    # Get external IP
-    result = run_gcloud([
-        "compute", "instances", "describe", CONFIG["instance_name"],
-        "--project", project_id,
-        "--zone", CONFIG["zone"],
-        "--format", "get(networkInterfaces[0].accessConfigs[0].natIP)",
-    ], capture_output=True)
-
-    external_ip = result.stdout.strip()
-
     print("\n" + "=" * 60)
-    print("DEPLOYMENT INITIATED (IAP-secured)")
+    print("DEPLOYMENT INITIATED (IAP-secured, no external IP)")
     print("=" * 60)
     print(f"Instance: {CONFIG['instance_name']}")
     print(f"Zone: {CONFIG['zone']}")
@@ -269,6 +260,8 @@ def deploy(project_id: str) -> str:
     print("  - Installing Ollama")
     print("  - Downloading model (~16 GB)")
     print("  - Creating model and starting server")
+    print()
+    print("NOTE: VM has no external IP. All access is via IAP tunnel.")
     print()
     print("Check progress with:")
     print(f"  python deploy_gce_llamacpp.py status")
@@ -280,29 +273,6 @@ def deploy(project_id: str) -> str:
     print("SSH into VM:")
     print(f"  python deploy_gce_llamacpp.py ssh")
     print("=" * 60)
-
-    # Save IP to file
-    with open(".medgemma_ip", "w") as f:
-        f.write(external_ip)
-
-    return external_ip
-
-
-def get_external_ip(project_id: str) -> str:
-    """Get external IP of the VM."""
-    # Try to read from cache
-    if os.path.exists(".medgemma_ip"):
-        with open(".medgemma_ip") as f:
-            return f.read().strip()
-
-    result = run_gcloud([
-        "compute", "instances", "describe", CONFIG["instance_name"],
-        "--project", project_id,
-        "--zone", CONFIG["zone"],
-        "--format", "get(networkInterfaces[0].accessConfigs[0].natIP)",
-    ], capture_output=True)
-
-    return result.stdout.strip()
 
 
 def start_iap_tunnel(project_id: str) -> subprocess.Popen:
@@ -550,10 +520,6 @@ def cleanup(project_id: str) -> None:
         "--project", project_id,
         "--quiet",
     ])
-
-    # Remove IP cache
-    if os.path.exists(".medgemma_ip"):
-        os.remove(".medgemma_ip")
 
     print("✓ Cleanup complete!")
 

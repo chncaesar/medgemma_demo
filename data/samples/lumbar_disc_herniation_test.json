@@ -1,0 +1,83 @@
+{
+  "test_date": "2026-01-15",
+  "model": "medgemma:latest",
+  "prompt": "A 28-year-old male athlete presents with sudden onset of severe lower back pain after attempting a heavy deadlift at the gym. He describes the pain as sharp and radiating down his left leg to the calf. He also reports tingling and numbness in the left foot. Bending forward or sitting worsens the pain. What is the most likely diagnosis and what red flags should be assessed?",
+  "response": {
+    "likely_diagnosis": "Lumbar disc herniation with radiculopathy (L5 or S1 nerve root)",
+    "reasoning": {
+      "mechanism_of_injury": "Heavy deadlift causes high axial load and flexion/extension stress - common cause of disc herniation",
+      "symptoms": [
+        "Sudden onset of severe lower back pain - typical for acute disc herniation",
+        "Sharp pain radiating down left leg to calf (sciatica) - classic nerve root compression",
+        "Tingling and numbness in left foot - sensory nerve fiber involvement",
+        "Pain worsened by bending forward or sitting - increases intradiscal pressure"
+      ]
+    },
+    "differential_diagnoses": [
+      {
+        "condition": "Lumbar Muscle Strain/Sprain",
+        "notes": "Usually less severe, less likely to have radicular symptoms"
+      },
+      {
+        "condition": "Lumbar Spinal Stenosis",
+        "notes": "Neurogenic claudication pattern, more common in older individuals"
+      },
+      {
+        "condition": "Spondylolisthesis",
+        "notes": "Can cause radiculopathy but acute onset makes disc herniation more likely"
+      },
+      {
+        "condition": "Fracture",
+        "notes": "Possible with trauma, less likely without underlying pathology"
+      },
+      {
+        "condition": "Cauda Equina Syndrome",
+        "notes": "Surgical emergency - must be ruled out"
+      }
+    ],
+    "red_flags": {
+      "cauda_equina_syndrome": {
+        "urgency": "EMERGENCY - requires immediate surgical evaluation",
+        "symptoms_to_assess": [
+          "Bowel/Bladder dysfunction - incontinence or retention (MOST CRITICAL)",
+          "Saddle anesthesia - numbness in perineal area, inner thighs, buttocks, genitals",
+          "Significant bilateral leg weakness - difficulty walking or standing"
+        ]
+      },
+      "infection": {
+        "conditions": ["Epidural abscess", "Discitis", "Osteomyelitis"],
+        "symptoms_to_assess": [
+          "Fever or chills",
+          "Recent infection elsewhere in body",
+          "Intravenous drug use",
+          "Immunosuppression",
+          "Pain worse at night or unrelieved by rest"
+        ]
+      },
+      "tumor": {
+        "symptoms_to_assess": [
+          "History of cancer (breast, lung, prostate, kidney, thyroid)",
+          "Unexplained weight loss",
+          "Age > 50",
+          "Pain worse at night or unrelieved by rest"
+        ]
+      },
+      "fracture": {
+        "symptoms_to_assess": [
+          "Significant trauma beyond lifting",
+          "Osteoporosis risk factors",
+          "Long-term steroid use"
+        ]
+      }
+    },
+    "management_if_no_red_flags": {
+      "conservative_treatment": [
+        "Rest - avoiding aggravating activities",
+        "Pain management - NSAIDs, muscle relaxants, potentially short-term opioids",
+        "Physical therapy"
+      ],
+      "imaging": "MRI if symptoms persist or worsen despite conservative treatment"
+    },
+    "disclaimer": "This information is for educational purposes and should not be considered medical advice. Always consult with a qualified healthcare professional."
+  }
+}

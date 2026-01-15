@@ -1,0 +1,68 @@
+{
+  "test_date": "2026-01-15",
+  "model": "medgemma:latest",
+  "prompt": "A 55-year-old female presents with progressive pain in both hands, particularly in the fingers. She reports morning stiffness lasting about 30 minutes, difficulty gripping objects, and visible swelling in the finger joints. The pain is worse after periods of inactivity. What is the likely diagnosis and recommended workup?",
+  "response": {
+    "likely_diagnosis": "Rheumatoid Arthritis (RA)",
+    "reasoning": {
+      "age_and_gender": "RA is more common in women, often presenting between ages 30-60",
+      "symptom_pattern": [
+        "Progressive pain - RA is chronic, progressive inflammatory condition",
+        "Bilateral hand involvement - RA typically affects joints symmetrically",
+        "Finger involvement (MCP and PIP joints) - classic for RA",
+        "Morning stiffness >30 minutes - hallmark of inflammatory arthritis",
+        "Difficulty gripping - related to pain and swelling",
+        "Visible swelling (synovitis) - characteristic of RA",
+        "Pain worse after inactivity - typical of inflammatory arthritis"
+      ]
+    },
+    "differential_diagnoses": [
+      {
+        "condition": "Osteoarthritis (OA)",
+        "notes": "Usually affects DIP joints, CMC joint of thumb. Morning stiffness typically <30 minutes. Bony swelling rather than soft tissue."
+      },
+      {
+        "condition": "Psoriatic Arthritis (PsA)",
+        "notes": "Can affect hands, often asymmetrically. May involve DIP joints. Associated with psoriasis."
+      },
+      {
+        "condition": "Systemic Lupus Erythematosus (SLE)",
+        "notes": "Can cause arthritis, often non-erosive. Usually accompanied by other systemic symptoms."
+      },
+      {
+        "condition": "Gout/Pseudogout",
+        "notes": "Typically acute, monoarticular attacks. Polyarticular forms exist."
+      },
+      {
+        "condition": "Fibromyalgia",
+        "notes": "Widespread pain without significant joint swelling or prolonged morning stiffness."
+      }
+    ],
+    "recommended_workup": {
+      "history_and_physical": [
+        "Detailed history - onset, duration, progression, specific joints, stiffness duration",
+        "Physical exam - assess all joints for swelling, tenderness, warmth, redness, ROM, deformity",
+        "Look for extra-articular manifestations (rheumatoid nodules, vasculitis, lung findings)",
+        "Assess functional status"
+      ],
+      "laboratory_tests": [
+        "Rheumatoid Factor (RF) - positive in ~70-80% of RA patients",
+        "Anti-CCP Antibodies - ~95-98% specificity for RA",
+        "ESR and CRP - markers of inflammation",
+        "Complete Blood Count (CBC)",
+        "Comprehensive Metabolic Panel (CMP)",
+        "Urinalysis"
+      ],
+      "imaging_studies": [
+        "Hand and Wrist X-rays (AP and Lateral) - assess erosions, joint space narrowing, periarticular osteopenia",
+        "Ultrasound or MRI - more sensitive for early synovitis and erosions"
+      ]
+    },
+    "key_points": [
+      "Early diagnosis and treatment crucial to prevent joint damage",
+      "2010 ACR/EULAR classification criteria often used",
+      "Referral to Rheumatologist recommended"
+    ],
+    "disclaimer": "This information is for general guidance only and does not substitute for professional medical advice."
+  }
+}

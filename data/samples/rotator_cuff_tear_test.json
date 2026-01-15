@@ -1,0 +1,89 @@
+{
+  "test_date": "2026-01-15",
+  "model": "medgemma:latest",
+  "prompt": "A 62-year-old right-hand dominant male presents with 3 months of progressive right shoulder pain. The pain is located over the lateral shoulder and worsens at night, often waking him from sleep. He has difficulty reaching overhead and behind his back. He denies any trauma but works as a painter. On examination, there is weakness with resisted abduction and external rotation. What is the likely diagnosis, differential diagnoses, and recommended evaluation?",
+  "response": {
+    "likely_diagnosis": "Rotator Cuff Pathology (Tendinopathy/Tear)",
+    "specific_considerations": [
+      "Rotator Cuff Tendinopathy/Impingement Syndrome - inflammation and degeneration of tendons",
+      "Rotator Cuff Tear - partial or full-thickness, likely involving supraspinatus and/or infraspinatus"
+    ],
+    "reasoning": {
+      "patient_factors": {
+        "age": "62 years - degenerative conditions common",
+        "occupation": "Painter - repetitive overhead work is risk factor",
+        "dominant_hand": "Right - affected side matches dominant hand use"
+      },
+      "symptom_analysis": [
+        "Lateral shoulder pain - classic location for rotator cuff pathology",
+        "Night pain waking from sleep - associated with rotator cuff tears/inflammation",
+        "Difficulty overhead/behind back - functional limitation consistent with cuff issues",
+        "No trauma - suggests degenerative or overuse etiology",
+        "Progressive over 3 months - typical for degenerative tears"
+      ],
+      "examination_findings": {
+        "weakness_abduction": "Supraspinatus muscle involvement",
+        "weakness_external_rotation": "Infraspinatus/teres minor involvement"
+      }
+    },
+    "differential_diagnoses": [
+      {
+        "condition": "Adhesive Capsulitis (Frozen Shoulder)",
+        "notes": "Progressive pain and stiffness, limited active AND passive ROM. Primary feature is stiffness."
+      },
+      {
+        "condition": "Glenohumeral Osteoarthritis",
+        "notes": "Degenerative joint changes, deep aching pain worse with activity."
+      },
+      {
+        "condition": "Subacromial Bursitis",
+        "notes": "Often occurs with impingement, significant weakness less common without cuff tear."
+      },
+      {
+        "condition": "AC Joint Arthritis",
+        "notes": "Pain at top of shoulder, worse with cross-body adduction."
+      },
+      {
+        "condition": "Cervical Radiculopathy",
+        "notes": "Nerve root compression, usually with neck pain, numbness, tingling in dermatomal pattern."
+      },
+      {
+        "condition": "Biceps Tendinopathy/Tear",
+        "notes": "Anterior shoulder pain, weakness with elbow flexion/supination."
+      }
+    ],
+    "recommended_evaluation": {
+      "history": [
+        "Confirm onset, progression, aggravating/relieving factors",
+        "Impact on daily activities",
+        "Prior treatments",
+        "Ask about passive range of motion"
+      ],
+      "physical_examination": {
+        "range_of_motion": "Active and passive ROM in all planes - flexion, abduction, internal/external rotation",
+        "strength_testing": "Manual muscle testing of supraspinatus, infraspinatus, teres minor, subscapularis",
+        "special_tests": {
+          "impingement": ["Neer's test", "Hawkins-Kennedy test"],
+          "rotator_cuff_tear": ["Empty Can test (supraspinatus)", "External Rotation Lag Sign (infraspinatus)", "Lift-off test (subscapularis)", "Drop Arm Test (full-thickness tear)"]
+        },
+        "palpation": "Tenderness over rotator cuff tendons, subacromial space, AC joint, biceps tendon"
+      },
+      "imaging": {
+        "xrays": {
+          "purpose": "Rule out osteoarthritis, fractures, acromial spurs",
+          "views": ["AP", "Lateral", "Outlet view (axillary)"]
+        },
+        "mri": {
+          "purpose": "Gold standard for soft tissue evaluation",
+          "evaluates": ["Rotator cuff tendons", "Labrum", "Bursa", "Tear size and location"]
+        },
+        "ultrasound": {
+          "purpose": "Alternative to MRI, less expensive",
+          "notes": "Operator-dependent, may be less sensitive for deeper structures"
+        }
+      }
+    },
+    "management_considerations": "Treatment decision (conservative vs surgical) depends on tear size, patient factors, and functional demands",
+    "disclaimer": "This comprehensive approach will help pinpoint the exact nature and severity of the shoulder pathology, guiding appropriate treatment."
+  }
+}
