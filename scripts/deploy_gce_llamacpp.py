@@ -4,25 +4,55 @@ Deploy MedGemma 27B GGUF on GCP Compute Engine with Ollama
 
 Uses g2-standard-12 machine with 1x L4 GPU (24GB VRAM) and Ollama server.
 Model: unsloth/medgemma-27b-it-GGUF (Q4_K_M quantization, ~16GB)
+Cost: ~$1.08/hr when running
+
+IMPORTANT: The VM and Ollama service are protected by Google IAP (Identity-Aware Proxy).
+All access must go through IAP tunnel - direct external IP access is not allowed.
+
+Commands:
+    deploy      Create a new VM with MedGemma (first-time setup)
+    restart     Start a stopped VM and restart Ollama service
+    status      Check if Ollama server is ready and list models
+    test        Send a test prompt to MedGemma
+    tunnel      Start persistent IAP tunnel for API access (localhost:18080)
+    ssh         SSH into the VM via IAP tunnel
+    cleanup     Delete VM and firewall rules
 
 Usage:
     # Set environment variables
     export GOOGLE_CLOUD_PROJECT="your-project-id"
 
-    # Deploy VM
+    # First-time deployment (creates VM, downloads model ~16GB, takes 10-15 min)
     python deploy_gce_llamacpp.py deploy
 
-    # Check status
+    # Start a stopped VM and restart Ollama (use this after VM was stopped)
+    python deploy_gce_llamacpp.py restart
+
+    # Check if server is ready
     python deploy_gce_llamacpp.py status
 
-    # Test endpoint
-    python deploy_gce_llamacpp.py test
+    # Start IAP tunnel for API access (keeps running until Ctrl+C)
+    python deploy_gce_llamacpp.py tunnel
+    # Then access Ollama API at: http://localhost:18080
 
-    # SSH into VM
+    # Test with a prompt
+    python deploy_gce_llamacpp.py test --prompt "What are symptoms of arthritis?"
+
+    # SSH into VM for manual operations
     python deploy_gce_llamacpp.py ssh
 
-    # Cleanup
+    # Delete VM and resources (to stop billing)
     python deploy_gce_llamacpp.py cleanup
+
+Ollama API (via tunnel):
+    # List models
+    curl http://localhost:18080/api/tags
+
+    # Chat completion
+    curl http://localhost:18080/api/chat -d '{
+        "model": "medgemma",
+        "messages": [{"role": "user", "content": "Hello"}]
+    }'
 """
 
 import argparse
@@ -133,12 +163,13 @@ sleep 5
 echo "Creating Ollama model..."
 ollama create medgemma -f /opt/models/Modelfile
 
-# Configure Ollama to listen on all interfaces
+# Configure Ollama to listen on all interfaces and keep model loaded for 4 hours
 echo "Configuring Ollama service for external access..."
 mkdir -p /etc/systemd/system/ollama.service.d
 cat > /etc/systemd/system/ollama.service.d/override.conf << 'OVERRIDEEOF'
 [Service]
 Environment="OLLAMA_HOST=0.0.0.0:8080"
+Environment="OLLAMA_KEEP_ALIVE=4h"
 OVERRIDEEOF
 
 # Restart Ollama with new config
@@ -399,6 +430,106 @@ def run_tunnel(project_id: str) -> None:
         print("\nTunnel stopped.")
 
 
+def get_vm_status(project_id: str) -> str | None:
+    """Get the current status of the VM (RUNNING, TERMINATED, etc.)."""
+    result = run_gcloud([
+        "compute", "instances", "describe", CONFIG["instance_name"],
+        "--project", project_id,
+        "--zone", CONFIG["zone"],
+        "--format", "get(status)",
+    ], capture_output=True)
+
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip()
+
+
+def start_vm(project_id: str) -> bool:
+    """Start a stopped VM."""
+    print(f"Starting VM {CONFIG['instance_name']}...")
+    result = run_gcloud([
+        "compute", "instances", "start", CONFIG["instance_name"],
+        "--project", project_id,
+        "--zone", CONFIG["zone"],
+    ])
+    return result.returncode == 0
+
+
+def stop_vm(project_id: str) -> bool:
+    """Stop a running VM."""
+    print(f"Stopping VM {CONFIG['instance_name']}...")
+    result = run_gcloud([
+        "compute", "instances", "stop", CONFIG["instance_name"],
+        "--project", project_id,
+        "--zone", CONFIG["zone"],
+    ])
+    return result.returncode == 0
+
+
+def restart_ollama_service(project_id: str) -> None:
+    """Restart Ollama service on the VM via SSH."""
+    print("Restarting Ollama service on VM...")
+    # Ensure config is in place (OLLAMA_HOST and OLLAMA_KEEP_ALIVE)
+    config_cmd = (
+        "sudo mkdir -p /etc/systemd/system/ollama.service.d && "
+        "echo -e '[Service]\\nEnvironment=\"OLLAMA_HOST=0.0.0.0:8080\"\\nEnvironment=\"OLLAMA_KEEP_ALIVE=4h\"' "
+        "| sudo tee /etc/systemd/system/ollama.service.d/override.conf > /dev/null && "
+        "sudo systemctl daemon-reload && "
+        "sudo systemctl restart ollama && sleep 3 && sudo systemctl status ollama"
+    )
+    result = run_gcloud([
+        "compute", "ssh", CONFIG["instance_name"],
+        "--project", project_id,
+        "--zone", CONFIG["zone"],
+        "--tunnel-through-iap",
+        "--command", config_cmd,
+    ])
+    if result.returncode == 0:
+        print("✓ Ollama service restarted successfully!")
+    else:
+        print("✗ Failed to restart Ollama service")
+
+
+def restart(project_id: str) -> None:
+    """Start the VM if stopped and restart Ollama service."""
+    print("=" * 60)
+    print("Restarting MedGemma Server")
+    print("=" * 60)
+
+    # Check VM status
+    status = get_vm_status(project_id)
+
+    if status is None:
+        print(f"✗ VM '{CONFIG['instance_name']}' not found.")
+        print("  Run 'deploy' first to create the VM.")
+        sys.exit(1)
+
+    print(f"VM Status: {status}")
+
+    if status == "TERMINATED" or status == "STOPPED":
+        print("\nVM is stopped. Starting VM...")
+        if not start_vm(project_id):
+            print("✗ Failed to start VM")
+            sys.exit(1)
+        print("✓ VM started")
+        print("\nWaiting for VM to be ready (30 seconds)...")
+        time.sleep(30)
+    elif status == "RUNNING":
+        print("✓ VM is already running")
+    else:
+        print(f"VM is in state: {status}. Waiting...")
+        time.sleep(10)
+
+    # Restart Ollama service
+    print("\n" + "-" * 40)
+    restart_ollama_service(project_id)
+
+    print("\n" + "=" * 60)
+    print("MedGemma server should now be ready!")
+    print("Check status: python deploy_gce_llamacpp.py status")
+    print("=" * 60)
+
+
 def cleanup(project_id: str) -> None:
     """Delete the VM and firewall rule."""
     print("Cleaning up resources...")
@@ -460,6 +591,9 @@ def main():
     # Tunnel
     subparsers.add_parser("tunnel", help="Start IAP tunnel for API access")
 
+    # Restart
+    subparsers.add_parser("restart", help="Start VM if stopped and restart Ollama service")
+
     # Cleanup
     subparsers.add_parser("cleanup", help="Delete VM and resources")
 
@@ -483,6 +617,8 @@ def main():
         ssh_to_vm(args.project_id)
     elif args.command == "tunnel":
         run_tunnel(args.project_id)
+    elif args.command == "restart":
+        restart(args.project_id)
     elif args.command == "cleanup":
         cleanup(args.project_id)
 
